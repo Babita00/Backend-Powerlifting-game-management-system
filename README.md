@@ -54,4 +54,60 @@ project-root/
 ├── README.md
 └── tsconfig.json              # TypeScript configuration
 
+## API Overview
+
+This backend provides RESTful endpoints for managing powerlifting competitions, athlete registrations, dynamic forms, lift attempts, and basic quiz/test functionality.
+
+### Authentication
+
+| Method | Endpoint                  | Description                          |
+|--------|---------------------------|--------------------------------------|
+| POST   | `/api/auth/register`      | Register a new user                  |
+| POST   | `/api/auth/login`         | Login and receive JWT token          |
+| GET    | `/api/auth/me`            | Get current authenticated user info  |
+
+### Competitions / Events
+
+| Method | Endpoint                        | Description                                      |
+|--------|---------------------------------|--------------------------------------------------|
+| POST   | `/api/events`                   | Create a new event (Admin only)                  |
+| GET    | `/api/events`                   | List all events (public or filtered)             |
+| GET    | `/api/events/:eventId`          | Get details of a specific event                  |
+
+### Dynamic Registration Forms
+
+| Method | Endpoint                                   | Description                                                  |
+|--------|--------------------------------------------|--------------------------------------------------------------|
+| GET    | `/api/events/:eventId/form`                | Returns dynamic form definition (field_0, field_1, etc.)     |
+| POST   | `/api/events/:eventId/submissions`         | Submit a completed registration form                         |
+| GET    | `/api/events/:eventId/submissions`         | List submissions (official/admin view with filters)          |
+| PATCH  | `/api/events/:eventId/submissions/:submissionId` | Update a submission (e.g., approve, edit)         |
+
+### Lift Attempts (Core Functionality)
+
+| Method | Endpoint                                          | Description                                                                 |
+|--------|---------------------------------------------------|-----------------------------------------------------------------------------|
+| POST   | `/api/attempts/:attemptId/initialize`             | Initialize attempts for squat, bench, deadlift (attempts 1–3)               |
+| GET    | `/api/attempts/:attemptId`                        | Get current lift attempts (athlete or official view)                        |
+| PATCH  | `/api/attempts/:attemptId/lifts/:liftType`        | Update lift attempt (weight, status, pass/fail, notes, etc.)<br>liftType: `SQUAT` \| `BENCH` \| `DEADLIFT` |
+
+### Test / Quiz Module (Optional / Integrated)
+
+| Method | Endpoint                                   | Description                          |
+|--------|--------------------------------------------|--------------------------------------|
+| POST   | `/api/attempts/:attemptId/answers`         | Submit answers to quiz/test questions|
+| GET    | `/api/attempts/:attemptId/results`         | Get quiz/test results                |
+
+### Roles & Permissions
+
+- **Admin**  
+  Can create events, manage users, configure scoring rules, and access all data.
+
+- **Official**  
+  Can view athlete lists, manage lift attempts, validate results, and view submissions.
+
+- **Athlete**  
+  Can register for events, view their own attempts, submit quiz answers, and see personal results.
+
+All endpoints are protected by JWT authentication where required. Admin and Official roles have elevated permissions.
 
