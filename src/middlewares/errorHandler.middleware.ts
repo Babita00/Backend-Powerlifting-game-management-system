@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-
-import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
-import { createError, toAppError } from '../utils/errors'
+import { HttpStatusCodes as STATUS } from '~/constants/httpStatusCodes'
 import logger from '~/utils/logger'
+import { createError, toAppError } from '~/utils/errors'
 
 // Global error handling middleware
 export const errorMiddleware = (
