@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 
 import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
 import { createError, toAppError } from '../utils/errors'
-import logger from '../utils/logger.ts'
+import logger from '~/utils/logger'
 
 // Global error handling middleware
 export const errorMiddleware = (
@@ -21,6 +21,7 @@ export const errorMiddleware = (
   }
   if (process.env.NODE_ENV === 'development' && appErr.info) {
     payload.info = appErr.info
+    payload.statusCode = appErr.statusCode
   }
 
   res.status(appErr.statusCode || STATUS.INTERNAL_SERVER_ERROR).json(payload)

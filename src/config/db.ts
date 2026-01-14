@@ -15,8 +15,8 @@ const postgresConnectionOptions: DataSourceOptions = {
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   synchronize: process.env.DB_SYNCHRONIZE === 'true',
-  entities: [path.join(rootDir, 'src/**/*.entity.ts')],
-  migrations: [path.join(rootDir, 'src/migrations/**/*.ts')],
+  entities: [path.join(rootDir, 'src/models/**/*.entity.ts')],
+  migrations: [path.join(rootDir, 'src/migration/**/*.ts')],
   logging: false,
 }
 

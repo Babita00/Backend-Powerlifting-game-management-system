@@ -2,7 +2,7 @@ import express, { Router } from 'express'
 
 // import { registerSwagger } from './utils/swagger'
 import { errorMiddleware, notFoundHandler } from './middlewares/errorHandler.middleware'
-import { UPLOAD_DIR } from './constants/constants.js'
+import { UPLOAD_DIR } from './constants/constants'
 
 const app = express()
 const apiRouter = Router()
