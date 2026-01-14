@@ -1,8 +1,8 @@
 import 'reflect-metadata'
 import dotenv from 'dotenv'
-import app from './app.js'
-import AppDataSource from './config/db.js'
-import logger from './utils/logger.js'
+import app from './app'
+import AppDataSource from './config/db'
+import logger from './utils/logger'
 
 dotenv.config()
 

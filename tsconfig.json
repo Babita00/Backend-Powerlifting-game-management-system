@@ -1,38 +1,42 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "~/*": ["src/*"]
+      // You can also add more if needed, e.g.:
+      // "@/*": ["src/*"],
+      // "@config/*": ["src/config/*"]
     },
-    "target": "ES2020",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+
+    "target": "ES2022",
+    "lib": ["ES2023"],
+
     "module": "ESNext",
-    "skipLibCheck": true,
+    "moduleResolution": "Bundler",
 
-    /* Required for TypeORM and decorators */
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "strictPropertyInitialization": false,
+    "noEmit": true, // ← critical: let tsx / nest / swc / esbuild handle emission
+    "isolatedModules": true, // required when noEmit + bundler mode
+    "allowImportingTsExtensions": true, // ← allows import "./foo.ts" (but you usually won't need it)
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* React JSX support */
-    "jsx": "react-jsx",
-
-    /* Strictness */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    "resolveJsonModule": true,
     "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Required for NestJS, TypeORM, class-validator/transformer, etc. */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+
     "types": ["node"]
-  }
+  },
+
+  "include": ["src/**/*", "test/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
