@@ -1,8 +1,10 @@
 import { Request, Response } from 'express'
 import * as AuthService from '../services/auth.service'
 import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
-import { successResponse } from '~/utils/response'
+import { errorResponse, successResponse } from '~/utils/response'
 import { CustomRequest } from '~/types/customRequest'
+import { toUserResponse } from '~/utils/userMapper'
+import { UserRepo } from '~/repositories/user.repo'
 
 function setRefreshCookie(res: Response, token: string) {
   res.cookie('refreshToken', token, {
@@ -61,5 +63,21 @@ export const logout = async (req: Request, res: Response) => {
 }
 
 export const me = async (req: CustomRequest, res: Response) => {
-  return successResponse(res, STATUS.OK, 'Data fetched successfully', (req as any).user)
+  const authUser = req.user
+
+  if (!authUser?.id) {
+    return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized')
+  }
+
+  const user = await UserRepo.findActiveById(authUser.id)
+  if (!user) {
+    return errorResponse(res, STATUS.NOT_FOUND, 'User not found')
+  }
+
+  return successResponse(
+    res,
+    STATUS.OK,
+    'Data fetched successfully',
+    toUserResponse(user)
+  )
 }
