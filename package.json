@@ -12,19 +12,21 @@
     "start:prod": "node dist/main.js",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix",
-    "migration:generate": "tsx src/config/db.ts && tsx node_modules/typeorm/cli.js migration:generate src/server/migrations/migration -d src/server/database/database.ts",
-    "migration:run": "tsx node_modules/typeorm/cli.js migration:run -d src/server/database/database.ts",
-    "migration:revert": "tsx node_modules/typeorm/cli.js migration:revert -d src/server/database/database.ts",
-    "migration:show": "tsx node_modules/typeorm/cli.js migration:show -d src/server/database/database.ts"
+    "migration:generate": "tsx ./node_modules/typeorm/cli.js migration:generate src/migrations/init -d src/config/db.ts",
+    "migration:run": "tsx ./node_modules/typeorm/cli.js migration:run -d src/config/db.ts",
+    "migration:revert": "tsx ./node_modules/typeorm/cli.js migration:revert -d src/config/db.ts",
+    "migration:show": "tsx ./node_modules/typeorm/cli.js migration:show -d src/config/db.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.16.3",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.28",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.0.8",
     "eslint": "^9.39.2",
     "nodemon": "^3.1.11",

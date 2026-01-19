@@ -1,7 +1,8 @@
-import { Entity, Column, Index } from 'typeorm'
+import { Entity, Column, Index, OneToMany } from 'typeorm'
 import { TABLE_NAME } from '../constants/tableName'
 import { AppBaseEntity } from '../baseEntity/base.entity'
 import { userRole } from '../constants/userRole'
+import { RefreshToken } from './refreshToken.entity'
 
 @Entity({ name: TABLE_NAME.USERS })
 export class User extends AppBaseEntity {
@@ -36,10 +37,13 @@ export class User extends AppBaseEntity {
   @Column({
     type: 'enum',
     enum: userRole,
-    default: userRole.USER,
+    default: userRole.PLAYER,
   })
   role: userRole
 
   @Column('boolean', { default: true })
   isActive: boolean
+
+  @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
+  refreshTokens!: RefreshToken[]
 }
