@@ -11,7 +11,6 @@ interface AccessTokenPayload {
   exp: number
 }
 
-// Extend Express Request safely
 declare global {
   namespace Express {
     interface Request {
@@ -45,13 +44,11 @@ export const requireAuth = async (req: Request, res: Response, next: NextFunctio
       return errorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token')
     }
 
-    // Optional DB check (recommended)
     const user = await UserRepo.findActiveById(payload.id)
     if (!user) {
       return errorResponse(res, STATUS.UNAUTHORIZED, 'User not found or inactive')
     }
 
-    // Attach minimal user info to request
     req.user = {
       id: user.id,
       role: payload.role,

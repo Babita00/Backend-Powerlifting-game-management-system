@@ -1,4 +1,3 @@
-// utils/userMapper.ts
 import { User } from '../models/user.entity'
 
 export function toUserResponse(user: User) {

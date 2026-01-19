@@ -6,7 +6,6 @@ import { errorResponse } from '~/utils/response'
 export const requireRole =
   (allowedRoles: userRole[]) => (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      // This should never happen if requireAuth is used correctly
       return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized')
     }
 
