@@ -3,7 +3,7 @@ import { User } from '../models/user.entity'
 
 const repo = AppDataSource.getRepository(User)
 
-export const UserRepo = {
+export const userRepo = {
   findByEmail(email: string) {
     return repo.findOne({ where: { email } })
   },

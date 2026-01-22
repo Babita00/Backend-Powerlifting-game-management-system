@@ -35,3 +35,12 @@ export function verifyRefreshToken(token: string): RefreshPayload | null {
     return null
   }
 }
+
+export function verifyAccessToken(token: string): AccessPayload | null {
+  try {
+    const secret = getSecret('ACCESS_TOKEN_SECRET')
+    return jwt.verify(token, secret) as AccessPayload
+  } catch {
+    return null
+  }
+}

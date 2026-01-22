@@ -1,61 +1,38 @@
-import { Request, Response, NextFunction } from 'express'
-import jwt from 'jsonwebtoken'
-import { UserRepo } from '../repositories/user.repo'
+import { Response, NextFunction } from 'express'
 import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
 import { errorResponse } from '../utils/response'
+import { CustomRequest } from '~/types/customRequest'
+import { verifyAccessToken } from '~/utils/jwtToken'
+import { userRepo } from '~/repositories/user.repo'
 
-interface AccessTokenPayload {
-  id: string
-  role: string
-  iat: number
-  exp: number
-}
-
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string
-        role: string
-      }
-    }
-  }
-}
-
-export const requireAuth = async (req: Request, res: Response, next: NextFunction) => {
+export const requireAuth = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return errorResponse(res, STATUS.UNAUTHORIZED, 'Access token missing')
+      return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized Access')
     }
 
     const token = authHeader.split(' ')[1]
-    const secret = process.env.ACCESS_TOKEN_SECRET
 
-    if (!secret) {
-      throw new Error('ACCESS_TOKEN_SECRET not configured')
+    const payload = verifyAccessToken(token)
+    if (!payload) {
+      return errorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired access token')
     }
 
-    let payload: AccessTokenPayload
-    try {
-      payload = jwt.verify(token, secret) as AccessTokenPayload
-    } catch {
-      return errorResponse(res, STATUS.UNAUTHORIZED, 'Invalid or expired token')
-    }
+    const user = await userRepo.findActiveById(payload.id)
 
-    const user = await UserRepo.findActiveById(payload.id)
     if (!user) {
-      return errorResponse(res, STATUS.UNAUTHORIZED, 'User not found or inactive')
+      return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized Access')
     }
 
-    req.user = {
-      id: user.id,
-      role: payload.role,
-    }
-
+    req.user = user
     next()
-  } catch (err) {
-    next(err)
+  } catch {
+    return errorResponse(res, STATUS.UNAUTHORIZED, 'Invalid Request, Token Expired!')
   }
 }

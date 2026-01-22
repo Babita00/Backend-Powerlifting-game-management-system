@@ -1,13 +1,16 @@
 import AppDataSource from '../config/db'
-import { UserRepo } from '../repositories/user.repo.ts'
+import { userRepo } from '../repositories/user.repo.ts'
 import { RefreshTokenRepo } from '../repositories/refreshToken.repo'
 import { hashRefreshToken } from '../utils/tokenHash'
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt'
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken,
+} from '../utils/jwtToken.ts'
 import bcrypt from 'bcryptjs'
-import { userRole } from '~/constants/userRole.ts'
 
 function refreshExpiryDate(): Date {
-  const days = Number(process.env.REFRESH_TOKEN_DAYS || 7)
+  const days = Number(process.env.REFRESH_TOKEN_EXPIRES_IN || 7)
   const d = new Date()
   d.setDate(d.getDate() + days)
   return d
@@ -18,35 +21,27 @@ export async function register(params: {
   lastName?: string | null
   email: string
   password: string
-  role?: string
 }) {
-  const existing = await UserRepo.findByEmailWithPassword(params.email.toLowerCase())
+  const existing = await userRepo.findByEmailWithPassword(params.email.toLowerCase())
 
   if (existing) throw new Error('Email already in use')
 
   const passwordHash = await bcrypt.hash(params.password, 10)
 
-  const user = UserRepo.create({
+  const user = userRepo.create({
     firstName: params.firstName,
     lastName: params.lastName ?? null,
     email: params.email.toLowerCase(),
     password: passwordHash,
-    role: (params.role as userRole) ?? 'player',
     isActive: true,
   })
 
-  const saved = await UserRepo.save(user)
+  const saved = await userRepo.save(user)
   return {
     id: saved.id,
     firstName: user.firstName,
     lastName: user.lastName,
-    profileImage: user.profileImage,
     email: user.email,
-    phone: user.phone,
-    age: user.age,
-    weight: user.weight,
-    gender: user.gender,
-    role: user.role,
   }
 }
 
@@ -58,7 +53,7 @@ export async function login(params: {
 }) {
   const normalizedEmail = params.email.toLowerCase().trim()
 
-  const userWithPassword = await UserRepo.findByEmailWithPassword(normalizedEmail)
+  const userWithPassword = await userRepo.findByEmailWithPassword(normalizedEmail)
 
   if (!userWithPassword) {
     throw new Error('Invalid credentials')
@@ -127,7 +122,7 @@ export async function refreshRotate(params: {
       throw new Error('Refresh token expired')
     }
 
-    const user = await UserRepo.findActiveById(payload.id)
+    const user = await userRepo.findActiveById(payload.id)
     if (!user) throw new Error('User not found or inactive')
 
     await RefreshTokenRepo.revokeById(session.id, manager)

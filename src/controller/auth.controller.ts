@@ -4,7 +4,7 @@ import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
 import { errorResponse, successResponse } from '~/utils/response'
 import { CustomRequest } from '~/types/customRequest'
 import { toUserResponse } from '~/utils/userMapper'
-import { UserRepo } from '~/repositories/user.repo'
+import { userRepo } from '~/repositories/user.repo'
 
 function setRefreshCookie(res: Response, token: string) {
   res.cookie('refreshToken', token, {
@@ -69,7 +69,7 @@ export const me = async (req: CustomRequest, res: Response) => {
     return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized')
   }
 
-  const user = await UserRepo.findActiveById(authUser.id)
+  const user = await userRepo.findActiveById(authUser.id)
   if (!user) {
     return errorResponse(res, STATUS.NOT_FOUND, 'User not found')
   }
