@@ -9,19 +9,19 @@ import {
 } from '../utils/jwtToken.ts'
 import bcrypt from 'bcryptjs'
 
-function refreshExpiryDate(): Date {
+const refreshExpiryDate = (): Date => {
   const days = Number(process.env.REFRESH_TOKEN_EXPIRES_IN || 7)
-  const d = new Date()
-  d.setDate(d.getDate() + days)
-  return d
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date
 }
 
-export async function register(params: {
+export const register = async (params: {
   firstName: string
   lastName?: string | null
   email: string
   password: string
-}) {
+}) => {
   const existing = await userRepo.findByEmailWithPassword(params.email.toLowerCase())
 
   if (existing) throw new Error('Email already in use')
@@ -45,12 +45,12 @@ export async function register(params: {
   }
 }
 
-export async function login(params: {
+export const login = async (params: {
   email: string
   password: string
   userAgent?: string | null
   ip?: string | null
-}) {
+}) => {
   const normalizedEmail = params.email.toLowerCase().trim()
 
   const userWithPassword = await userRepo.findByEmailWithPassword(normalizedEmail)
@@ -99,11 +99,11 @@ export async function login(params: {
   return { accessToken, refreshToken }
 }
 
-export async function refreshRotate(params: {
+export const refreshRotate = async (params: {
   refreshToken: string
   userAgent?: string | null
   ip?: string | null
-}) {
+}) => {
   const payload = verifyRefreshToken(params.refreshToken)
   if (!payload) throw new Error('Invalid or expired refresh token')
 
@@ -149,7 +149,7 @@ export async function refreshRotate(params: {
   })
 }
 
-export async function logout(params: { refreshToken: string }) {
+export const logout = async (params: { refreshToken: string }) => {
   const payload = verifyRefreshToken(params.refreshToken)
   if (!payload) return
 
@@ -164,6 +164,6 @@ export async function logout(params: { refreshToken: string }) {
   await RefreshTokenRepo.revokeById(session.id)
 }
 
-export async function logoutAll(params: { userId: string }) {
+export const logoutAll = async (params: { userId: string }) => {
   await RefreshTokenRepo.revokeAllForUser(params.userId)
 }

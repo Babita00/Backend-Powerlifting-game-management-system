@@ -1,6 +1,6 @@
 import { User } from '../models/user.entity'
 
-export function toUserResponse(user: User) {
+export const toUserResponse = (user: User) => {
   return {
     id: user.id,
     firstName: user.firstName,

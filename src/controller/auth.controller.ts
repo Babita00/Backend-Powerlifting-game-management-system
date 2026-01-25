@@ -6,7 +6,7 @@ import { CustomRequest } from '~/types/customRequest'
 import { toUserResponse } from '~/utils/userMapper'
 import { userRepo } from '~/repositories/user.repo'
 
-function setRefreshCookie(res: Response, token: string) {
+const setRefreshCookie = (res: Response, token: string) => {
   res.cookie('refreshToken', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -16,7 +16,7 @@ function setRefreshCookie(res: Response, token: string) {
   })
 }
 
-function clearRefreshCookie(res: Response) {
+const clearRefreshCookie = (res: Response) => {
   res.clearCookie('refreshToken', { path: '/auth/refresh' })
 }
 
