@@ -3,7 +3,6 @@ import { HttpStatusCodes as STATUS } from '~/constants/httpStatusCodes'
 import logger from '~/utils/logger'
 import { createError, toAppError } from '~/utils/errors'
 
-// Global error handling middleware
 export const errorMiddleware = (
   err: unknown,
   _req: Request,
@@ -26,7 +25,6 @@ export const errorMiddleware = (
   res.status(appErr.statusCode || STATUS.INTERNAL_SERVER_ERROR).json(payload)
 }
 
-// 404 handler to forward to error middleware
 export const notFoundHandler = (req: Request, _res: Response, next: NextFunction) => {
   next(createError(`Route ${req.originalUrl} not found`, STATUS.NOT_FOUND))
 }

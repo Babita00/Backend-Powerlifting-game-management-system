@@ -27,7 +27,6 @@ export const isAppError = (err: unknown): err is AppError => {
   return e.name === 'AppError' && typeof e.statusCode === 'number'
 }
 
-// Convert unknown errors into AppError
 export const toAppError = (err: unknown): AppError => {
   if (isAppError(err)) {
     return err
@@ -38,7 +37,6 @@ export const toAppError = (err: unknown): AppError => {
   return createError('Internal Server Error')
 }
 
-// route handlers to forward errors to the global error middleware
 export const errorCatcher = <
   T extends (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
 >(

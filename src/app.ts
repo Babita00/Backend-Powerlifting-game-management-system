@@ -1,4 +1,5 @@
 import express, { Router } from 'express'
+import authRoutes from './routes/auth.routes'
 
 // import { registerSwagger } from './utils/swagger'
 import { errorMiddleware, notFoundHandler } from './middlewares/errorHandler.middleware'
@@ -14,6 +15,8 @@ app.use('/uploads', express.static(UPLOAD_DIR))
 app.use('/api', apiRouter)
 
 // registerSwagger(apiRouter)
+
+apiRouter.use('/auth', authRoutes)
 
 // API-only error handlers
 apiRouter.use(notFoundHandler)
