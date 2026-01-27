@@ -7,13 +7,13 @@ import { CustomRequest } from '~/types/customRequest'
 export const requireRole =
   (allowedRoles: userRole[]) =>
   (req: CustomRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
+    const user = req.user
+
+    if (!user) {
       return errorResponse(res, STATUS.UNAUTHORIZED, 'Unauthorized')
     }
 
-    const { role } = req.user
-
-    if (!allowedRoles.includes(role as userRole)) {
+    if (!allowedRoles.includes(user.role)) {
       return errorResponse(
         res,
         STATUS.FORBIDDEN,
