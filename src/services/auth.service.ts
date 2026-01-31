@@ -10,7 +10,9 @@ import {
 import bcrypt from 'bcryptjs'
 
 const refreshExpiryDate = (): Date => {
-  const days = Number(process.env.REFRESH_TOKEN_EXPIRES_IN || 7)
+  const days = Number(process.env.REFRESH_TOKEN_EXPIRES_IN_DAYS ?? 7)
+  if (!Number.isFinite(days) || days <= 0) throw new Error('Bad refresh days')
+
   const date = new Date()
   date.setDate(date.getDate() + days)
   return date

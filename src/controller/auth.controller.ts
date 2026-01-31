@@ -36,7 +36,10 @@ export const login = async (req: Request, res: Response) => {
   })
 
   setRefreshCookie(res, refreshToken)
-  return successResponse(res, STATUS.OK, 'User logged in successfully', accessToken)
+  return successResponse(res, STATUS.OK, 'User logged in successfully', {
+    accessToken,
+    refreshToken,
+  })
 }
 
 export const refresh = async (req: Request, res: Response) => {

@@ -20,36 +20,43 @@ const prizeSchema = z.object({
   amount: z.coerce.number().min(0, 'Prize amount must be >= 0'),
 })
 
-export const createEventSchema = z
-  .object({
-    title: z.string().trim().min(1).max(255),
-    description: z.string().trim().min(1).nullable().optional(),
-    venue: z.string().trim().min(1).max(255),
+const eventBaseSchema = z.object({
+  title: z.string().trim().min(1).max(255),
+  description: z.string().trim().min(1).nullable().optional(),
+  venue: z.string().trim().min(1).max(255),
 
-    startDate: z.coerce.date(),
-    endDate: z.coerce.date().nullable().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().nullable().optional(),
 
-    weightCategories: z.array(z.string().trim().min(1)).min(1),
+  weightCategories: z.array(z.string().trim().min(1)).min(1),
 
-    competitionType: z.nativeEnum(CompetitionType),
-
-    status: z.nativeEnum(EventStatus).optional(),
-
-    organizerPhoneNumber: z.string().trim().min(7).max(30).nullable().optional(),
-    eventImage: z.string().trim().nullable().optional(),
-
-    otherOfficial: contactSchema.nullable().optional(),
-    coordinator: contactSchema.nullable().optional(),
-
-    prizes: z.array(prizeSchema).optional(),
-  })
-  .refine(data => !data.endDate || data.endDate >= data.startDate, {
-    message: 'endDate must be >= startDate',
-    path: ['endDate'],
-  })
-
-export const updateEventSchema = createEventSchema.partial().extend({
+  competitionType: z.nativeEnum(CompetitionType),
   status: z.nativeEnum(EventStatus).optional(),
+
+  organizerPhoneNumber: z.string().trim().min(7).max(30).nullable().optional(),
+  eventImage: z.string().trim().nullable().optional(),
+
+  otherOfficial: contactSchema.nullable().optional(),
+  coordinator: contactSchema.nullable().optional(),
+
+  prizes: z.array(prizeSchema).optional(),
+})
+
+export const createEventSchema = eventBaseSchema.refine(
+  data => !data.endDate || data.endDate >= data.startDate,
+  { message: 'endDate must be >= startDate', path: ['endDate'] }
+)
+
+// update: partial first (allowed), then add refine if you want
+export const updateEventSchema = eventBaseSchema.partial().superRefine((data, ctx) => {
+  // For updates, only validate the date relation if BOTH are present
+  if (data.startDate && data.endDate && data.endDate < data.startDate) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'endDate must be >= startDate',
+      path: ['endDate'],
+    })
+  }
 })
 
 export const createEventValidator = async (
