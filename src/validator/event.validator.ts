@@ -1,8 +1,9 @@
 import { z } from 'zod'
 import { NextFunction, Request, Response } from 'express'
-import { zodErrorMessage } from '~/utils/zodErrorMessage'
-import { HttpStatusCodes as STATUS } from '~/constants/httpStatusCodes'
-import { CompetitionType } from '~/constants/competitionType'
+import { zodErrorMessage } from '../utils/zodErrorMessage'
+import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
+import { CompetitionType } from '../constants/competitionType'
+import { EventStatus } from '../constants/eventStatus'
 
 export const uuidSchema = z.object({
   id: z.uuid(),
@@ -21,9 +22,9 @@ const prizeSchema = z.object({
 
 export const createEventSchema = z
   .object({
-    title: z.string().trim().min(1, 'Title is required'),
-    description: z.string().trim().min(1, 'Description is required'),
-    venue: z.string().trim().min(1, 'Venue is required'),
+    title: z.string().trim().min(1).max(255),
+    description: z.string().trim().min(1).nullable().optional(),
+    venue: z.string().trim().min(1).max(255),
 
     startDate: z.coerce.date(),
     endDate: z.coerce.date().nullable().optional(),
@@ -32,30 +33,24 @@ export const createEventSchema = z
 
     competitionType: z.nativeEnum(CompetitionType),
 
-    organizerPhoneNumber: z.string().trim().min(7),
+    status: z.nativeEnum(EventStatus).optional(),
+
+    organizerPhoneNumber: z.string().trim().min(7).max(30).nullable().optional(),
     eventImage: z.string().trim().nullable().optional(),
 
-    otherOfficial: contactSchema,
-    coordinator: contactSchema,
+    otherOfficial: contactSchema.nullable().optional(),
+    coordinator: contactSchema.nullable().optional(),
 
-    prizes: z.array(prizeSchema).default([]),
+    prizes: z.array(prizeSchema).optional(),
   })
   .refine(data => !data.endDate || data.endDate >= data.startDate, {
     message: 'endDate must be >= startDate',
     path: ['endDate'],
   })
 
-export type CreateEventDTO = z.infer<typeof createEventSchema>
-
-// Update: allow partial updates (and keep the same refine)
-export const updateEventSchema = createEventSchema
-  .partial()
-  .refine(data => !data.endDate || !data.startDate || data.endDate >= data.startDate, {
-    message: 'endDate must be >= startDate',
-    path: ['endDate'],
-  })
-
-export type UpdateEventDTO = z.infer<typeof updateEventSchema>
+export const updateEventSchema = createEventSchema.partial().extend({
+  status: z.nativeEnum(EventStatus).optional(),
+})
 
 export const createEventValidator = async (
   req: Request,
@@ -76,7 +71,6 @@ export const updateEventValidator = async (
   next: NextFunction
 ) => {
   const { eventId } = req.params
-
   const idParsed = uuidSchema.safeParse({ id: eventId })
   if (!idParsed.success) {
     const returnMessage = zodErrorMessage(idParsed)
@@ -98,12 +92,10 @@ export const validateEventId = async (
   next: NextFunction
 ) => {
   const { eventId } = req.params
-
   const idParsed = uuidSchema.safeParse({ id: eventId })
   if (!idParsed.success) {
     const returnMessage = zodErrorMessage(idParsed)
     return res.status(STATUS.BAD_REQUEST).json({ data: returnMessage })
   }
-
   next()
 }

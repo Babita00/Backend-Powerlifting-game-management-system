@@ -20,7 +20,7 @@ export class Event extends AppBaseEntity {
   @Column('varchar', { length: 255 })
   title: string
 
-  @Column('text')
+  @Column('text', { nullable: true })
   description: string
 
   @Column('varchar', { length: 255 })
@@ -48,17 +48,17 @@ export class Event extends AppBaseEntity {
   })
   status: EventStatus
 
-  @Column('varchar', { length: 30 })
-  organizerPhoneNumber: string
+  @Column('varchar', { length: 30, nullable: true })
+  organizerPhoneNumber: string | null
 
   @Column('text', { nullable: true })
   eventImage: string | null
 
-  @Column({ type: 'jsonb' })
-  otherOfficial: ContactInfo
+  @Column({ type: 'jsonb', nullable: true })
+  otherOfficial: ContactInfo | null
 
-  @Column({ type: 'jsonb' })
-  coordinator: ContactInfo
+  @Column({ type: 'jsonb', nullable: true })
+  coordinator: ContactInfo | null
 
   @Column('uuid')
   createdById: string
