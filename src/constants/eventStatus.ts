@@ -1,6 +1,2 @@
-export enum EventStatus {
-  UPCOMING = 'upcoming',
-  ONGOING = 'ongoing',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-}
+export const EVENT_STATUS = ['upcoming', 'ongoing', 'completed', 'cancelled'] as const
+export type EventStatus = (typeof EVENT_STATUS)[number]

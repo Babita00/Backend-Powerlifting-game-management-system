@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { NextFunction, Request, Response } from 'express'
 import { zodErrorMessage } from '../utils/zodErrorMessage'
 import { HttpStatusCodes as STATUS } from '../constants/httpStatusCodes'
-import { CompetitionType } from '../constants/competitionType'
-import { EventStatus } from '../constants/eventStatus'
+import { EVENT_STATUS } from '~/constants/eventStatus'
+import { COMPETITION_TYPES } from '~/constants/competitionType'
 
 export const uuidSchema = z.object({
   id: z.uuid(),
@@ -20,9 +20,12 @@ const prizeSchema = z.object({
   amount: z.coerce.number().min(0, 'Prize amount must be >= 0'),
 })
 
+const competitionTypeSchema = z.enum(COMPETITION_TYPES)
+const eventStatusSchema = z.enum(EVENT_STATUS)
+
 const eventBaseSchema = z.object({
   title: z.string().trim().min(1).max(255),
-  description: z.string().trim().min(1).nullable().optional(),
+  description: z.string().trim().nullable().optional(),
   venue: z.string().trim().min(1).max(255),
 
   startDate: z.coerce.date(),
@@ -30,8 +33,8 @@ const eventBaseSchema = z.object({
 
   weightCategories: z.array(z.string().trim().min(1)).min(1),
 
-  competitionType: z.nativeEnum(CompetitionType),
-  status: z.nativeEnum(EventStatus).optional(),
+  competitionType: competitionTypeSchema,
+  status: eventStatusSchema.optional(),
 
   organizerPhoneNumber: z.string().trim().min(7).max(30).nullable().optional(),
   eventImage: z.string().trim().nullable().optional(),
@@ -47,12 +50,10 @@ export const createEventSchema = eventBaseSchema.refine(
   { message: 'endDate must be >= startDate', path: ['endDate'] }
 )
 
-// update: partial first (allowed), then add refine if you want
 export const updateEventSchema = eventBaseSchema.partial().superRefine((data, ctx) => {
-  // For updates, only validate the date relation if BOTH are present
   if (data.startDate && data.endDate && data.endDate < data.startDate) {
     ctx.addIssue({
-      code: z.ZodIssueCode.custom,
+      code: 'custom',
       message: 'endDate must be >= startDate',
       path: ['endDate'],
     })

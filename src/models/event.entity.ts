@@ -3,8 +3,8 @@ import { AppBaseEntity } from '../baseEntity/base.entity'
 import { TABLE_NAME } from '../constants/tableName'
 import { User } from './user.entity'
 import { EventPrize } from './eventPrize.entity'
-import { CompetitionType } from '~/constants/competitionType'
-import { EventStatus } from '~/constants/eventStatus'
+import { COMPETITION_TYPES, type CompetitionType } from '~/constants/competitionType'
+import { EVENT_STATUS, type EventStatus } from '~/constants/eventStatus'
 
 export type ContactInfo = {
   name: string
@@ -35,18 +35,11 @@ export class Event extends AppBaseEntity {
   @Column('text', { array: true, default: () => "'{}'" })
   weightCategories: string[]
 
-  @Column({
-    type: 'enum',
-    enum: CompetitionType,
-  })
-  competitionType: CompetitionType
+  @Column({ type: 'enum', enum: COMPETITION_TYPES })
+  competitionType!: CompetitionType
 
-  @Column({
-    type: 'enum',
-    enum: EventStatus,
-    default: EventStatus.UPCOMING,
-  })
-  status: EventStatus
+  @Column({ type: 'enum', enum: EVENT_STATUS, default: 'upcoming' })
+  status!: EventStatus
 
   @Column('varchar', { length: 30, nullable: true })
   organizerPhoneNumber: string | null
