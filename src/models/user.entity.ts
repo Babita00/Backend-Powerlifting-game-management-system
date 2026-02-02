@@ -3,6 +3,7 @@ import { TABLE_NAME } from '../constants/tableName'
 import { AppBaseEntity } from '../baseEntity/base.entity'
 import { userRole } from '../constants/userRole'
 import { RefreshToken } from './refreshToken.entity'
+import { Event } from './event.entity'
 
 @Entity({ name: TABLE_NAME.USERS })
 export class User extends AppBaseEntity {
@@ -46,4 +47,7 @@ export class User extends AppBaseEntity {
 
   @OneToMany(() => RefreshToken, refreshToken => refreshToken.user)
   refreshTokens!: RefreshToken[]
+
+  @OneToMany(() => Event, event => event.createdBy)
+  createdEvents: Event[]
 }
